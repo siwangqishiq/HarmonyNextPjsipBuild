@@ -28,7 +28,7 @@ patchflag=true
 prepare() {
     pwd 
     # 拷贝 OHAudio 驱动
-    cp ohaudio_dev.c ${unpkgname}/pjmedia/src/pjmedia-audiodev
+    cp ohaudio_dev.cpp ${unpkgname}/pjmedia/src/pjmedia-audiodev
 
     # 拷贝裁剪配置
     cp config_site.h ${unpkgname}/pjlib/include/pj
@@ -98,7 +98,7 @@ build() {
     --disable-libwebrtc --disable-gsm-codec 2>&1
 
     make dep 2>&1
-    make VERBOSE=1 2>&1
+    make -j VERBOSE=1 2>&1
 
     ret=$?
     cd $OLDPWD
