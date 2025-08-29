@@ -83,6 +83,9 @@ static pjmedia_aud_stream_op oha_stream_op = {
 /* ---------- 工厂入口 ---------- */
 
 //创建工厂类
+#ifdef __cplusplus
+extern "C"{
+#endif
 PJ_DEF(pjmedia_aud_dev_factory*) pjmedia_ohaudio_factory(pj_pool_factory *pf)
 {
     struct oha_audio_factory *f;
@@ -94,6 +97,9 @@ PJ_DEF(pjmedia_aud_dev_factory*) pjmedia_ohaudio_factory(pj_pool_factory *pf)
     
     return &f->base;
 }
+#ifdef __cplusplus
+}
+#endif
 
 static pj_status_t oha_factory_init(pjmedia_aud_dev_factory *f)
 {
