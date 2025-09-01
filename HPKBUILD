@@ -10,25 +10,30 @@ archs=("arm64-v8a")
 license=("GPL" "OSS")
 depends=("opus")
 makedepends=()
-
 source="https://github.com/$pkgname/pjproject/archive/refs/tags/$pkgver.tar.gz"
-
 autounpack=true
 downloadpackage=true
 buildtools="configure"
-
 builddir=$pkgname-${pkgver}
 packagename=$builddir.tar.gz
 unpkgname=pjproject-2.13.1
-source envset.sh
+source envset.sh 
 host=
-
 patchflag=true
 
 prepare() {
     pwd 
     # 拷贝 OHAudio 驱动
     cp ohaudio_dev.cpp ${unpkgname}/pjmedia/src/pjmedia-audiodev
+
+    # 拷贝 自定义audio_backend 
+    cp pjmedia_custom_backend.h ${unpkgname}/pjmedia/include
+
+    # 修改原有Endpoint接口
+    rm ${unpkgname}/pjsip/include/pjsua2/endpoint.hpp 
+    cp endpoint.hpp ${unpkgname}/pjsip/include/pjsua2 
+    rm ${unpkgname}/pjsip/src/pjsua2/endpoint.cpp 
+    cp endpoint.cpp ${unpkgname}/pjsip/src/pjsua2/endpoint.cpp 
 
     # 拷贝裁剪配置
     cp config_site.h ${unpkgname}/pjlib/include/pj

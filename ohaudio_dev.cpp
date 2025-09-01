@@ -8,8 +8,11 @@
 #include <pj/assert.h>
 #include <pj/log.h>
 #include <pj/os.h>
+#include <pjmedia_custom_backend.h>
 
 #define THIS_FILE   "ohaudio_dev.c"
+
+CustomAudioBackend *globalCustomAudioBackend = nullptr;
 
 /* ---------- 数据结构 ---------- */
 typedef struct oha_audio_factory{
@@ -103,6 +106,13 @@ PJ_DEF(pjmedia_aud_dev_factory*) pjmedia_ohaudio_factory(pj_pool_factory *pf)
 
 static pj_status_t oha_factory_init(pjmedia_aud_dev_factory *f)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log oha_factory_init"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend factoryInit"));
+        return globalCustomAudioBackend->factoryInit(f);
+    }
+    
+    PJ_LOG (4,(THIS_FILE, "native_log oha_factory_init factoryInit"));
     struct oha_audio_factory *oha_factory = (struct oha_audio_factory *)f;
 
     oha_factory->dev_count = 1;
@@ -119,6 +129,13 @@ static pj_status_t oha_factory_init(pjmedia_aud_dev_factory *f)
 
 static pj_status_t oha_factory_destroy(pjmedia_aud_dev_factory *f)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log oha_factory_destroy"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend oha_factory_destroy"));
+        return globalCustomAudioBackend->factoryDestroy(f);
+    }
+
+    PJ_LOG (4,(THIS_FILE, "native_log oha_factory_destroy"));
     struct oha_audio_factory *oha_factory = (struct oha_audio_factory *)f;
     pj_pool_safe_release(&oha_factory->pool);
     return PJ_SUCCESS;
@@ -126,11 +143,24 @@ static pj_status_t oha_factory_destroy(pjmedia_aud_dev_factory *f)
 
 static pj_status_t oha_factory_refresh(pjmedia_aud_dev_factory *f)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log factory_refresh"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend oha_factory_refresh"));
+        return globalCustomAudioBackend->factoryRefresh(f);
+    }
+    PJ_LOG (4,(THIS_FILE, "native_log oha_factory_refresh"));
     return PJ_SUCCESS;
 }
 
 static unsigned oha_factory_get_dev_count(pjmedia_aud_dev_factory *f)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log factory_get_dev_count"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend factory_get_dev_count"));
+        return globalCustomAudioBackend->factoryGetDevCount(f);
+    }
+
+    PJ_LOG (4,(THIS_FILE, "native_log oha_factory_get_dev_count"));
     struct oha_audio_factory *oha_factory = (struct oha_audio_factory *)f;
     return oha_factory->dev_count;
 }
@@ -139,6 +169,13 @@ static pj_status_t oha_factory_get_dev_info(pjmedia_aud_dev_factory *f,
                                             unsigned index,
                                             pjmedia_aud_dev_info *info)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log factory_get_dev_info"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend factory_get_dev_info"));
+        return globalCustomAudioBackend->factoryGetDevInfo(f, index, info);
+    }
+
+    PJ_LOG (4,(THIS_FILE, "native_log oha_factory_get_dev_info"));
     struct oha_audio_factory *oha_factory = (struct oha_audio_factory *)f;
     pj_memcpy(info, &oha_factory->info, sizeof(pjmedia_aud_dev_info));
     return PJ_SUCCESS;
@@ -148,6 +185,13 @@ static pj_status_t oha_factory_default_param(pjmedia_aud_dev_factory *f,
                                              unsigned index,
                                              pjmedia_aud_param *param)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log factory_default_param"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend factory_default_param"));
+        return globalCustomAudioBackend->factoryDefaultParam(f,index, param);
+    }
+    
+    PJ_LOG (4,(THIS_FILE, "native_log oha_factory_default_param"));
     struct oha_audio_factory *oha_factory = (struct oha_audio_factory *)f;
     pj_bzero(param, sizeof(pjmedia_aud_param));
 
@@ -173,6 +217,13 @@ static pj_status_t oha_factory_create_stream(pjmedia_aud_dev_factory *f,
                                              void *user_data,
                                              pjmedia_aud_stream **p_aud_strm)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log factory_create_stream"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend factory_create_stream"));
+        return globalCustomAudioBackend->factoryCreateStream(f,param, rec_cb. play_cb,user_data, p_aud_strm);
+    }
+
+    PJ_LOG (4,(THIS_FILE, "native_log oha_factory_create_stream"));
     struct oha_audio_factory *oha_factory = (struct oha_audio_factory *)f;
     pj_pool_t *pool;
     struct oha_stream *strm;
@@ -204,27 +255,65 @@ static pj_status_t oha_factory_create_stream(pjmedia_aud_dev_factory *f,
 /* ---------- 流控制 ---------- */
 static pj_status_t oha_stream_start(pjmedia_aud_stream *strm)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log stream_start"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend stream_start"));
+        return globalCustomAudioBackend->streamStart(strm);
+    }
+
+    PJ_LOG (4,(THIS_FILE, "native_log oha_stream_start"));
     return PJ_SUCCESS;
 }
 
 static pj_status_t oha_stream_stop(pjmedia_aud_stream *strm)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log stream_stop"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend stream_stop"));
+        return globalCustomAudioBackend->streamStop(strm);
+    }
+
+    PJ_LOG (4,(THIS_FILE, "native_log oha_stream_stop"));
     return PJ_SUCCESS;
 }
 
 static pj_status_t oha_stream_destroy(pjmedia_aud_stream *strm)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log stream_destroy"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend stream_destroy"));
+        return globalCustomAudioBackend->streamDestroy(strm);
+    }
+    PJ_LOG (4,(THIS_FILE, "native_log oha_stream_destroy"));
     return PJ_SUCCESS;
 }
 
 static pj_status_t oha_stream_get_param(pjmedia_aud_stream *strm,pjmedia_aud_param *param){
+    PJ_LOG (4,(THIS_FILE, "native_log stream_get_param"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend stream_get_param"));
+        return globalCustomAudioBackend->streamGetParam(strm, param);
+    }
+    PJ_LOG (4,(THIS_FILE, "native_log oha_stream_get_param"));
     return PJ_SUCCESS;
 }
 
 static pj_status_t oha_stream_get_cap(pjmedia_aud_stream *strm,pjmedia_aud_dev_cap cap,void *value){
+    PJ_LOG (4,(THIS_FILE, "native_log stream_get_cap"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend stream_get_cap"));
+        return globalCustomAudioBackend->streamGetCap(strm, cap, value);
+    }
+    PJ_LOG (4,(THIS_FILE, "native_log oha_stream_get_cap"));
     return PJ_SUCCESS;
 }
 
 static pj_status_t oha_stream_set_cap(pjmedia_aud_stream *strm,pjmedia_aud_dev_cap cap,const void *value){
+    PJ_LOG (4,(THIS_FILE, "native_log stream_set_cap"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend stream_set_cap"));
+        return globalCustomAudioBackend->streamSetCap(strm, cap, value);
+    }
+    PJ_LOG (4,(THIS_FILE, "native_log oha_stream_set_cap"));
     return PJ_SUCCESS;
 }
