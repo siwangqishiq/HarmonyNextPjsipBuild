@@ -91,6 +91,13 @@ extern "C"{
 #endif
 PJ_DEF(pjmedia_aud_dev_factory*) pjmedia_ohaudio_factory(pj_pool_factory *pf)
 {
+    PJ_LOG (4,(THIS_FILE, "native_log pjmedia_ohaudio_factory"));
+    if(globalCustomAudioBackend != nullptr){
+        PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend pjmedia_ohaudio_factory"));
+        return globalCustomAudioBackend->buildFactory(pf);
+    }
+
+    PJ_LOG (4,(THIS_FILE, "native_log pjmedia_ohaudio_factory inlines"));
     struct oha_audio_factory *f;
     pj_pool_t *pool = pj_pool_create(pf, "ohaudio", 1024, 1024, NULL);
     f = PJ_POOL_ZALLOC_T(pool,struct oha_audio_factory);
@@ -220,7 +227,7 @@ static pj_status_t oha_factory_create_stream(pjmedia_aud_dev_factory *f,
     PJ_LOG (4,(THIS_FILE, "native_log factory_create_stream"));
     if(globalCustomAudioBackend != nullptr){
         PJ_LOG (4,(THIS_FILE, "native_log globalCustomAudioBackend factory_create_stream"));
-        return globalCustomAudioBackend->factoryCreateStream(f,param, rec_cb. play_cb,user_data, p_aud_strm);
+        return globalCustomAudioBackend->factoryCreateStream(f,param, rec_cb, play_cb, user_data, p_aud_strm);
     }
 
     PJ_LOG (4,(THIS_FILE, "native_log oha_factory_create_stream"));

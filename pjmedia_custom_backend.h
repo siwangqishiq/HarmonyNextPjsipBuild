@@ -10,6 +10,8 @@ public:
 
     ~CustomAudioBackend(){}
 
+    virtual pjmedia_aud_dev_factory* buildFactory(pj_pool_factory *pf) = 0;
+
     virtual pj_status_t factoryInit(pjmedia_aud_dev_factory *f) = 0;
     virtual pj_status_t factoryDestroy(pjmedia_aud_dev_factory *f) = 0;
     virtual pj_status_t factoryRefresh(pjmedia_aud_dev_factory *f) = 0;
